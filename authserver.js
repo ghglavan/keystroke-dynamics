@@ -13,7 +13,7 @@ var express = require('express'),
 
 //var url = 'mongodb://localhost:27017/test';
 
-init({24 : "in"});
+initPins({24 : "in"});
 writePin(24,1);
 
 
@@ -141,10 +141,9 @@ app.get('/', authenticatedOrNot, function(req, res) {
 
 
 function initPins(options){
-  Object.keys(obtions).forEach(function(pin,index) {
-    var fd = fs.openSync("/gpio/pin" + pin + "/direction","w");
-    fs.writeSync(fd,options.pin);
-    fs.close(fd);
+
+  Object.keys(options).forEach(function(pin,index) {
+    fs.writeFileSync("/gpio/pin" + pin + "/value",options[pin]);
   });
 
 }
