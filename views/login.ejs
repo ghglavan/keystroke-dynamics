@@ -23,21 +23,19 @@
 	</b>
 
 
-	<form action = "/login" method = "post">
+	<form>
 	<div>
 	 <label>Username:</label>
-	 <input type = "text" name = "username"/>
+	 <input type = "text" id = "name" name = "username"/>
 	</div>
 	<div>
 	 <label>Password:</label>
 	 <input type = "password" id = "pw" name = "password"/>
 	</div>
 	<div>
-	 <input type = "submit" value = "Log In" />
+	 	 <button id= "subm">Log In!</button>
 	</div>
 	</form>
-
-<a href = "register">Register</a>
 
 </body>
 
@@ -58,19 +56,29 @@ $(function () {
   var DT = {};
   var FT = {};
 
+  $("#subm").on("click",function(ev){
+    var name = $("#name").val();
+    var password = $("#pw").val();
+    if(name == "" || password == "" || name == undefined || password == undefined)
+      return;
 
+
+
+    $.post("/login",{username: name, password: password,
+                    VDT : JSON.stringify(VDT),VFT : JSON.stringify(VFT)});
+  });
 
   $( "#pw" ).keyup(function( event ) {
 
-
-
+  if(event.key.length == 1){
     DT[event.key].r = event.timeStamp;
     VDT.push(DT[event.key]);
-
+  }
   }).keydown(function( event ) {
     if ( event.which == 13 ) {
       event.preventDefault();
-      console.log(VDT);
+      VFT = makeVFT(VDT);
+      $("#subm").trigger("click");
     }
     console.log("da");
     DT[event.key] = {p : event.timeStamp,
@@ -79,7 +87,24 @@ $(function () {
   });
 
 
+function makeVFT(VDT){
+  var VFT = [];
+
+  for(var i = 1; i < VDT.length; i++){
+    var ob = {from : VDT[i-1].key,
+              to : VDT[i].key,
+              interval : VDT[i].p - VDT[i-1].p};
+    VFT.push(ob);
+  }
+
+  return VFT;
+
+}
+
+
 });
+
+
 
 </script>
 

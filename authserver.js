@@ -10,12 +10,13 @@ var express = require('express'),
     fs = require('fs');
 
 
+var registered = false;
 
-//var url = 'mongodb://localhost:27017/test';
+
 
 //fs.writeFileSync("/gpio/pin25/direction","out");
-initPins({24:"out"});
-writePin(25,0);
+//initPins({24:"out"});
+//writePin(25,0);
 
 
 var app = express();
@@ -23,6 +24,11 @@ var db;
 
 var connected = false;
 /*
+
+// We are going to use the database later on..
+
+
+var url = 'mongodb://localhost:27017/test';
 //---------------------------------------database waterfall --------------------
 
 async.waterfall([
@@ -79,9 +85,9 @@ users = [{
 
 // 2. configure passport-local to validate an incoming user and pw
 
-passport.use(new LocalStrategy(
-  function(username, password, done){
-
+passport.use(new LocalStrategy({passReqToCallback: true},
+  function(req,username, password, done){
+    console.log(req.body);
     if(connected){
       return done(null,false,{message : "Incorrect credentials. {user already connected}"});
     }
@@ -127,34 +133,60 @@ passport.deserializeUser(function (userId, done) {
 });
 
 app.post("/login", passport.authenticate('local',{
-    successRedirect: "/",
     failureRedirect : "/",
     succesFlash : { message :  "Welcome!" },
     failureFlash : true
-}));
+}), function(req,res){
+  console.log(req.body);
+});
+
+app.post("/register", function(req,res){
+  var means = req.body.means;
+  var devs = req.body.devs;
+
+  var username = req.body.username;
+  var password = req.body.password;
+
+  console.log(means);
+
+});
 
 
 app.get('/', authenticatedOrNot, function(req, res) {
 
-  console.log(req.sessionID + '\n' + req.sessionID.length);
-  res.render(__dirname+'/views/user.ejs', {name : req.user._id});
+  if(registered == true){
+    res.render(__dirname+'/views/user.ejs', {name : req.user._id});
+  }
 });
 
+
+/*
+  options -- object of type :
+      {
+        pin : option
+      }
+      where pin is an integer between 16 and 47 and option in a string(in or out)
+
+*/
 
 function initPins(options){
 
   Object.keys(options).forEach(function(pin,index) {
-    fs.writeFileSync("/gpio/pin" + pin + "/direction",options[pin]);
+    if(pin > 15 && pin < 48 && (options[pin] == "in" || options[pin] == out))
+      fs.writeFileSync("/gpio/pin" + pin + "/direction",options[pin]);
   });
 
 }
 
 function readPin(pin){
-  var c = fs.readFileSync("/gpio/pin" + pin + "/value");
-  return c;
+  if(pin > 15 && pin < 48){
+    var c = fs.readFileSync("/gpio/pin" + pin + "/value");
+    return c;
+  }
 }
 
 function writePin(pin, value){
+  if(pin > 15 && pin < 48)
   fs.writeFileSync("/gpio/pin" + pin + "/value",value);
 }
 
@@ -168,8 +200,11 @@ function authenticatedOrNot(req, res, next){
     if(error && error.length) {
       form = error[0] + form;
     }
-
-    res.render(__dirname +"/views/login.ejs",{m : form});
+    if(registered == true){
+      res.render(__dirname +"/views/login.ejs",{m : form});
+    }else{
+      res.render(__dirname +"/views/register.ejs",{tr : 4});
+    }
   }
 }
 

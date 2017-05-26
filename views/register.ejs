@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>	Register
+</title>
+
+
+
+</head>
+<body>
+
+<h2>Fill the next form.</h2>
+<p>Type your password in every password input as you try to login</p>
+<p>If the deviation from the mean of one or more inputs is too high, you will have to try again</p>
+<p>Note that we consider the first try when we test the others</p>
+<br>
+
+<p id = "err"></p>
+<form>
+  <div>
+   <label>Username</label>
+   <input type = "text" id = "name" name = "username"/>
+  </div>
+  <br>
+  <% for (var i = 1; i < tr; i++){ %>
+ <div>
+
+  <label>Password nr.<%=i%>:</label>
+  <input type = "password" id = <%="pw"+i%> name = "password"/>
+ </div>
+ <% } %>
+ <div>
+    <button id= "subm" type="button">Register!</button>
+ </div>
+</form>
+
+
+</body>
+
+
+<script
+     src="https://code.jquery.com/jquery-3.2.1.min.js"
+     integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+     crossorigin="anonymous"></script>
+
+<script>
+
+
+$(function () {
+  var VDT = [];
+  var VFT = [];
+<% for (var i = 1; i < tr; i++) { %>
+  var VFT<%=i%> = [];
+  var DT<%=i%> = {};
+
+  var VDT<%=i%> = [];
+<%}%>
+
+  var FT = {};
+
+<% for (var i = 1; i < tr; i++) { %>
+$("<%="#pw"+i%>").keyup(function( event ) {
+
+    if(event.key.length == 1){
+      DT<%=i%>[event.key].r = event.timeStamp;
+      VDT<%=i%>.push(DT<%=i%>[event.key]);
+    }
+    }).keydown(function( event ) {
+      if ( event.which == 13  || event.which == 9) {
+        if(event.which == 13)
+          event.preventDefault();
+
+      }
+      if(event.which == 8){
+        VDT<%=i%> = [];
+        $("<%="#pw"+i%>").val("");
+      }
+      if(event.key.length == 1){
+          DT<%=i%>[event.key] = {p : event.timeStamp,
+                          key : event.key};
+      }
+}).focusout(function(event){
+  VFT<%=i%> = makeVFT(VDT<%=i%>);
+}).focus(function(event){
+  VDT<%=i%> = [];
+  $("<%="#pw"+i%>").val("");
+});
+<% } %>
+
+
+ $("#subm").on("click",function(ev){
+   var name = $("#name").val();
+   <% for (var i = 1; i < tr; i++){ %>
+   var <%="pw"+i%> = $("<%="#pw"+i%>").val();
+
+   <%}%>
+     if(name == "" || name == undefined){
+       $("#err").text("Username should not be blank");
+       return;
+     }
+   <% for (var i = 1; i < tr; i++){ %>
+      if(<%="pw"+i%> == "" || <%="pw"+i%> == undefined){
+        $("#err").text("You have missed a field");
+        return;
+      }
+   <%}%>
+
+    <% for (var i = 2; i < tr; i++){ %>
+      if(pw1 != <%="pw"+i%>){
+        $("#err").text("Passwords 1 - <%=i%> missmatch");
+        return;
+      }
+    <%}%>
+
+    var mean1 = 0;
+    for(var j = 0; j < VFT1.length; j++){
+      mean1 += VFT1[j].interval;
+    }
+
+
+
+
+
+    mean1 /= VFT1.length;
+
+    console.log("mean1 " + mean1);
+
+    <% for (var i = 2; i < tr; i++){ %>
+      var mean<%=i%> = 0 ;
+
+        for(var j = 0; j < VFT<%=i%>.length; j++){
+          mean<%=i%> += VFT<%=i%>[j].interval;
+        }
+
+        mean<%=i%> /= VFT<%=i%>.length;
+
+        console.log("mean<%=i%> " + mean<%=i%>);
+
+        if(modul(mean1 - mean<%=i%>) > 200){
+          $("#err").text("Password <%=i%> was typed wrong");
+          return;
+        }
+
+    <%}%>
+
+    var intervalsMean = [];
+    var intervalsDeviation = [];
+
+  for(var j = 0; j < VFT1.length; j++){
+    var intM = 0;
+
+    <% for (var i = 1; i < tr; i++){ %>
+      intM += VFT<%=i%>[j].interval;
+
+
+    <%}%>
+    intM /= <%=tr%>;
+    var sD = 0;
+
+    <% for (var i = 1; i < tr; i++){ %>
+      sD += (VFT<%=i%>[j].interval - intM)*(VFT<%=i%>[j].interval - intM);
+
+    <%}%>
+
+    sD /= <%=tr%>;
+    sD = Math.sqrt(sD);
+
+
+    intervalsMean.push(intM);
+    intervalsDeviation.push(sD);
+
+}
+
+
+   $.post("/register",{username: name, password: pw1,
+                   means : JSON.stringify(intervalsMean), devs : JSON.stringify(intervalsDeviation)});
+ });
+
+function modul(nr){
+  return nr>0 ? nr : -nr;
+}
+
+function makeVFT(VDT){
+ var VFT = [];
+
+ for(var i = 1; i < VDT.length; i++){
+   var ob = {from : VDT[i-1].key,
+             to : VDT[i].key,
+             interval : VDT[i].p - VDT[i-1].p};
+   VFT.push(ob);
+ }
+
+ return VFT;
+
+}
+
+
+});
+
+
+
+</script>
+
+
+</html>
