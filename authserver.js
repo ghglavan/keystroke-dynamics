@@ -11,15 +11,17 @@ var express = require('express'),
 
 
 
-var url = 'mongodb://localhost:27017/test';
+//var url = 'mongodb://localhost:27017/test';
 
+init({24 : "in"});
+writePin(24,1);
 
 
 var app = express();
 var db;
 
 var connected = false;
-
+/*
 //---------------------------------------database waterfall --------------------
 
 async.waterfall([
@@ -43,7 +45,7 @@ async.waterfall([
 });
 
 //---------------------------------------database waterfall --------------------
-
+*/
 
 
 
@@ -138,6 +140,23 @@ app.get('/', authenticatedOrNot, function(req, res) {
 });
 
 
+function initPins(options){
+  Object.keys(obtions).forEach(function(pin,index) {
+    var fd = fs.openSync("/gpio/pin" + pin + "/direction","w");
+    fs.writeSync(fd,options.pin);
+    fs.close(fd);
+  });
+
+}
+
+function readPin(pin){
+  var c = fs.readFileSync("/gpio/pin" + pin + "/value");
+  return c;
+}
+
+function writePin(pin, value){
+  fs.writeFileSync("/gpio/pin" + pin + "/value",value);
+}
 
 
 function authenticatedOrNot(req, res, next){
