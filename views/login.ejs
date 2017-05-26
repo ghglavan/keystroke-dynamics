@@ -1,0 +1,87 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<title>	<% if (m.length > 0) { %>
+		<%= m %>
+	<% }else{ %>
+		Login
+	<%  }%>
+ </title>
+
+
+
+</head>
+<body>
+
+
+	<b>
+	<% if (m.length > 0) { %>
+		Incorrect username and/or password <br>
+		<%= m %>
+		<br>
+	<% } %>
+	</b>
+
+
+	<form action = "/login" method = "post">
+	<div>
+	 <label>Username:</label>
+	 <input type = "text" name = "username"/>
+	</div>
+	<div>
+	 <label>Password:</label>
+	 <input type = "password" id = "pw" name = "password"/>
+	</div>
+	<div>
+	 <input type = "submit" value = "Log In" />
+	</div>
+	</form>
+
+<a href = "register">Register</a>
+
+</body>
+
+
+<script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"></script>
+
+<script>
+
+
+$(function () {
+
+  var VDT = [];
+  var VFT = [];
+
+  var DT = {};
+  var FT = {};
+
+
+
+  $( "#pw" ).keyup(function( event ) {
+
+
+
+    DT[event.key].r = event.timeStamp;
+    VDT.push(DT[event.key]);
+
+  }).keydown(function( event ) {
+    if ( event.which == 13 ) {
+      event.preventDefault();
+      console.log(VDT);
+    }
+    console.log("da");
+    DT[event.key] = {p : event.timeStamp,
+                      key : event.key};
+
+  });
+
+
+});
+
+</script>
+
+
+</html>

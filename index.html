@@ -1,0 +1,73 @@
+<html>
+
+<head>
+<title> keystroke dynamic</title>
+</head>
+
+<body>
+
+
+  <form>
+    <label for="un">Username:</label>
+    <input type="text" name="un" value="username">
+    <br>
+    <label for="pw">Password:</label>
+    <input type="password" name="pw" id= "pw" value="password">
+
+
+  </form>
+
+
+</body>
+
+<script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"></script>
+
+<script>
+
+
+$(function () {
+
+  var VDT = [];
+  var VFT = [];
+
+  var DT = {};
+  var FT = {};
+
+  var patt = new RegExp(".");
+  console.log(patt.test("w"));
+  console.log(patt.test("W"));
+  console.log(patt.test("1"));
+  console.log(patt.test("%"));
+  console.log(patt.test("Wasd"));
+
+
+  $( "#pw" ).keyup(function( event ) {
+
+    if(event.which == 9) {
+      return;
+    }
+
+    DT[event.key].r = event.timeStamp;
+    VDT.push(DT[event.key]);
+
+  }).keydown(function( event ) {
+    if ( event.which == 13 ) {
+      event.preventDefault();
+      console.log(VDT);
+    }
+
+    DT[event.key] = {p : event.timeStamp,
+                      key : event.key};
+
+  });
+
+
+});
+
+</script>
+
+
+</html>
