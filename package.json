@@ -7,7 +7,7 @@
     "async": "^2.4.0",
     "body-parser": "1.x",
     "cookie-parser": "1.x",
-    "ejs": "~0.8.5",
+    "ejs": "2.5.5",
     "express": "4.x",
     "express-flash": "0.x",
     "express-session": "1.x",
